@@ -1,14 +1,28 @@
 import React, {Component} from 'react';
 import axios from 'axios';
+import ContactButton from './ContactButton';
+import { connect } from "react-redux";
+import {incrementContact} from "../actions/contact";
 
-class Users extends Component {
-    constructor() {
-        super();
+interface UsersState {
+    loading: boolean,
+    users: Array<any>
+}
+
+interface UsersProps {
+    count: number,
+    incrementCount: () => void
+};
+
+class Users extends React.Component<UsersProps, UsersState> {
+    constructor(props:UsersProps) {
+        super(props);
         this.state = { users: [], loading: true};
     }
 
     componentDidMount() {
         this.getUsers();
+        this.props.incrementCount();
     }
 
     getUsers() {
@@ -25,6 +39,7 @@ class Users extends Component {
                     <div className="container">
                         <div className="row">
                             <h2 className="text-center"><span>List of users</span></h2>
+                            <h3 className="text-center">Page displayed {this.props.count} times</h3>
                         </div>
                         {loading ? (
                             <div className={'row text-center'}>
@@ -45,7 +60,7 @@ class Users extends Component {
                                                         <p>{user.description}</p>
                                                     </div>
                                                     <div className="media-right align-self-center">
-                                                        <a href="#" className="btn btn-default">Contact Now</a>
+                                                        <ContactButton/>
                                                     </div>
                                                 </div>
                                             </li>
@@ -60,4 +75,15 @@ class Users extends Component {
         )
     }
 }
-export default Users;
+function mapDispatchToProps(dispatch) {
+    return {
+        incrementCount: () => dispatch(incrementContact()),
+    };
+}
+
+function mapStateToProps(state) {
+    return {
+      count: state.contactReducer.contact.count
+    };
+ }
+export default connect(mapStateToProps, mapDispatchToProps)(Users);

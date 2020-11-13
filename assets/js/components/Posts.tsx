@@ -1,10 +1,17 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 
+interface PostsState {
+    loading: boolean,
+    posts: Array<any>
+}
 
-class Posts extends Component {
-    constructor() {
-        super();
+interface PostsProps {
+};
+
+class Posts extends React.Component<PostsProps, PostsState> {
+    constructor(props:PostsProps) {
+        super(props);
 
         this.state = { posts: [], loading: true}
     }
