@@ -12,15 +12,20 @@ use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\Service\SerializerService;
+use Art\CatchphraseBundle\GenerateCatchphrase;
 
 class DefaultController extends AbstractController
 {
     /**
      * @Route("/{reactRouting}", name="home", defaults={"reactRouting": null})
      */
-    public function index()
+    public function index(GenerateCatchphrase $generateCatchphraseService)
     {
-        return $this->render('default/index.html.twig');
+        $generateCatchphrase = $generateCatchphraseService->getCatchphrase();
+
+        return $this->render('default/index.html.twig', array(
+            'catchphrase' => $generateCatchphrase
+        ));
     }
 
     /**
