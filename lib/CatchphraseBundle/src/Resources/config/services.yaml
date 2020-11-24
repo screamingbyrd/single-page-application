@@ -1,0 +1,11 @@
+parameters:
+
+services:
+
+    art_catchphrase.catchphrase:
+        class: Art\CatchphraseBundle\GenerateCatchphrase
+        public: true
+
+    Art\CatchphraseBundle\GenerateCatchphrase:
+        alias: art_catchphrase.catchphrase
+        public: false

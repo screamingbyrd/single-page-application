@@ -6,8 +6,11 @@ namespace Art\CatchphraseBundle;
 
 class GenerateCatchphrase
 {
-    public function __construct()
+    private $numberOfWord;
+
+    public function __construct($numberOfWord = 1)
     {
+        $this->numberOfWord = $numberOfWord;
     }
 
     /**
@@ -18,9 +21,15 @@ class GenerateCatchphrase
     public function getCatchphrase(): string
     {
         $len = 10;
-        $word = array_merge(range('a', 'z'), range('A', 'Z'));
-        shuffle($word);
-        return substr(implode($word), 0, $len);
+        $catchphrase = '';
+        for ($i = 0; $i <= $this->numberOfWord; $i++) {
+            $word = array_merge(range('a', 'z'), range('A', 'Z'));
+            shuffle($word);
+
+            $catchphrase.= substr(implode($word), 0, $len) . ' ';
+        }
+
+        return $catchphrase . ' !';
     }
 
 }

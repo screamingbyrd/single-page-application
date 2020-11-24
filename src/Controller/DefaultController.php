@@ -6,7 +6,10 @@ namespace App\Controller;
 
 use App\Entity\Post;
 use App\Entity\User;
+use App\Event\Events;
+use App\Event\FilterApiResponseEvent;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,12 +19,22 @@ use Art\CatchphraseBundle\GenerateCatchphrase;
 
 class DefaultController extends AbstractController
 {
+    private $generateCatchphraseService;
+
+    private $eventDispatcher;
+
+    public function __construct(GenerateCatchphrase $generateCatchphraseService, EventDispatcherInterface $eventDispatcher)
+    {
+        $this->generateCatchphraseService = $generateCatchphraseService;
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
     /**
      * @Route("/{reactRouting}", name="home", defaults={"reactRouting": null})
      */
-    public function index(GenerateCatchphrase $generateCatchphraseService)
+    public function index()
     {
-        $generateCatchphrase = $generateCatchphraseService->getCatchphrase();
+        $generateCatchphrase = $this->generateCatchphraseService->getCatchphrase();
 
         return $this->render('default/index.html.twig', array(
             'catchphrase' => $generateCatchphrase
@@ -37,7 +50,12 @@ class DefaultController extends AbstractController
         $repository = $entityManager->getRepository(User::class);
         $users = $repository->findAll();
 
-        $userArray = $serializerService->serialize($users, 'json');
+        $event = new FilterApiResponseEvent($users);
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch($event, Events::FILTER_API_GET_USERS);
+        }
+
+        $userArray = $serializerService->serialize($event->getData()    , 'json');
 
         $response = new Response();
 
